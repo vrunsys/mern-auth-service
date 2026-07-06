@@ -1,12 +1,15 @@
-import {Router} from "express";
-import type {Request, Response, NextFunction} from "express";
-import AuthController from "../Controller/AuthController.ts";
+import type { NextFunction, Request, Response } from "express";
+import { Router } from "express";
+import logger from "../config/logger.ts";
+import AuthController from "../controller/AuthController.ts";
+import UserService from "../service/UserService.ts";
 
 const router = Router();
-
-const controller = new AuthController();
+const userService = new UserService();
+const controller = new AuthController(userService, logger);
 
 router.post("/register", (req: Request, res: Response, next: NextFunction) =>
-controller.register(req, res, next))
+	controller.register(req, res, next),
+);
 
 export default router;

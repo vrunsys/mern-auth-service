@@ -9,6 +9,8 @@ import authRouter from "./route/auth.ts";
 
 const app = express();
 
+app.use(express.json());
+
 // biome-ignore lint: correctness/noUnusedVariables
 app.all("/health", (req, res) => {
 	res.status(200).json({ status: "OK" });
