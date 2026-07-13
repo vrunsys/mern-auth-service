@@ -12,11 +12,11 @@ const app = express();
 app.use(express.json());
 
 // biome-ignore lint: correctness/noUnusedVariables
-app.all("/health", (req, res) => {
+app.all("/api/health", (req, res) => {
 	res.status(200).json({ status: "OK" });
 });
 
-app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 
 // biome-ignore lint: correctness/noUnusedVariables
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
