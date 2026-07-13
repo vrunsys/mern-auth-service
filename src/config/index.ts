@@ -1,7 +1,8 @@
-const { PORT, NODE_ENV, DATABASE_URL } = process.env;
+const { PORT, NODE_ENV, DATABASE_URL, REFRESH_TOKEN_SECRET } = process.env;
 
 export const config = {
 	PORT: PORT,
 	NODE_ENV: NODE_ENV,
 	DATABASE_URL: DATABASE_URL,
+	REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET!,
 };

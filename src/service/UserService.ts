@@ -27,7 +27,7 @@ export default class UserService {
 				password: hashPassword,
 			};
 
-			const newUser = await db.insert(usersTable).values(user);
+			const newUser = await db.insert(usersTable).values(user).returning();
 			return newUser;
 		} catch (error) {
 			const err = createHttpError(500, "Failed to store in database");
