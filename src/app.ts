@@ -1,3 +1,4 @@
+import CookieParser from "cookie-parser";
 import express, {
 	type NextFunction,
 	type Request,
@@ -9,14 +10,16 @@ import authRouter from "./route/auth.ts";
 
 const app = express();
 
+app.use(express.static("public", { dotfiles: "allow" }));
+app.use(CookieParser());
 app.use(express.json());
 
 // biome-ignore lint: correctness/noUnusedVariables
-app.all("/api/health", (req, res) => {
+app.all("/health", (req, res) => {
 	res.status(200).json({ status: "OK" });
 });
 
-app.use("/api/auth", authRouter);
+app.use("/auth", authRouter);
 
 // biome-ignore lint: correctness/noUnusedVariables
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {

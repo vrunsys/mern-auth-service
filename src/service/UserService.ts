@@ -34,4 +34,14 @@ export default class UserService {
 			throw err;
 		}
 	}
+
+	async findByEmail(email: string) {
+		const user = await db
+			.select()
+			.from(usersTable)
+			.where(eq(usersTable.email, email))
+			.limit(1);
+
+		return user;
+	}
 }
