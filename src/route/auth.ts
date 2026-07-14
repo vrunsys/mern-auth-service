@@ -3,6 +3,7 @@ import { Router } from "express";
 import logger from "../config/logger.ts";
 import AuthController from "../controller/AuthController.ts";
 import authentication from "../middleware/authentication.ts";
+import validateRefreshToken from "../middleware/validateRefreshToken.ts";
 import { CredentialService } from "../service/CredentialService.ts";
 import { TokenService } from "../service/TokenService.ts";
 import UserService from "../service/UserService.ts";
@@ -40,4 +41,19 @@ router.get(
 	(req: Request, res: Response, next: NextFunction) =>
 		controller.self(req, res, next),
 );
+
+router.post(
+	"/refresh",
+	validateRefreshToken,
+	(req: Request, res: Response, next: NextFunction) =>
+		controller.refreshToken(req, res, next),
+);
+
+router.post(
+	"/logout",
+	authentication,
+	(req: Request, res: Response, next: NextFunction) =>
+		controller.logout(req, res, next),
+);
+
 export default router;

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import fs from "fs";
 import createHttpError from "http-errors";
 import { type JwtPayload, sign } from "jsonwebtoken";
@@ -42,16 +43,23 @@ export class TokenService {
 		return refreshToken;
 	}
 
-	async persistRefreshToken(user: typeof usersTable.$inferSelect) {
+	async persistRefreshToken(userId: typeof usersTable.$inferSelect.id) {
 		const MS_IN_YEAR = 365 * 24 * 60 * 60 * 1000;
 		const refreshToken = await db
 			.insert(refreshTokensTable)
 			.values({
-				userId: user.id,
+				userId: userId,
 				expiresAt: new Date(Date.now() + MS_IN_YEAR),
 			})
 			.returning();
 
 		return refreshToken[0];
+	}
+
+	async deleteRefreshToken(userId: typeof usersTable.$inferSelect.id) {
+		await db
+			.delete(refreshTokensTable)
+			.where(eq(refreshTokensTable.userId, userId));
+		return;
 	}
 }

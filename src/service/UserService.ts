@@ -44,4 +44,17 @@ export default class UserService {
 
 		return user;
 	}
+
+	async findById(id: number) {
+		const user = await db.query.users.findFirst({
+			columns: {
+				password: false,
+			},
+			where: {
+				id: id,
+			},
+		});
+
+		return user;
+	}
 }

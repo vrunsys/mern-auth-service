@@ -4,14 +4,14 @@ import createHttpError from "http-errors";
 import { type JwtPayload, sign } from "jsonwebtoken";
 import { config } from "../config/index.ts";
 import type logger from "../config/logger.ts";
-import type { usersTable } from "../db/schema.ts";
 import type { CredentialService } from "../service/CredentialService.ts";
 import type { TokenService } from "../service/TokenService.ts";
 import type UserService from "../service/UserService.ts";
-
-interface RegisterUserRequest extends Request {
-	body: typeof usersTable.$inferInsert;
-}
+import type {
+	AuthRequest,
+	LoginUserRequest,
+	RegisterUserRequest,
+} from "../types/index.ts";
 
 export default class AuthController {
 	constructor(
@@ -29,12 +29,12 @@ export default class AuthController {
 		try {
 			const { firstName, lastName, email, password } = req.body;
 
-			const newUser = await this.userService.create({
+			const newUser = (await this.userService.create({
 				firstName,
 				lastName,
 				email,
 				password,
-			});
+			})) as (typeof usersTable.$inferInsert)[];
 			this.log.info(`user has been register with id: ${newUser[0]?.id}`);
 
 			const payload: JwtPayload = {
@@ -45,7 +45,7 @@ export default class AuthController {
 			const accessToken = this.tokenService.generateAccessToken(payload);
 			const refreshToken = this.tokenService.generateRefreshToken(payload);
 			const persistedRefreshToken = await this.tokenService.persistRefreshToken(
-				newUser[0]!,
+				newUser[0].id,
 			);
 
 			res.cookie("refreshToken", refreshToken, {
@@ -68,7 +68,7 @@ export default class AuthController {
 		}
 	}
 
-	async login(req: Request, res: Response, next: NextFunction) {
+	async login(req: LoginUserRequest, res: Response, next: NextFunction) {
 		const result = validationResult(req);
 		if (!result.isEmpty()) {
 			res.status(400).json({ errors: result.array() });
@@ -99,7 +99,7 @@ export default class AuthController {
 			const accessToken = this.tokenService.generateAccessToken(payload);
 			const refreshToken = this.tokenService.generateRefreshToken(payload);
 			const persistedRefreshToken = await this.tokenService.persistRefreshToken(
-				user[0]!,
+				user[0]!.id,
 			);
 
 			res.cookie("refreshToken", refreshToken, {
@@ -122,7 +122,55 @@ export default class AuthController {
 		}
 	}
 
-	async self(req: Request, res: Response, next: NextFunction) {
-		res.json();
+	async logout(req: AuthRequest, res: Response, next: NextFunction) {
+		try {
+			await this.tokenService.deleteRefreshToken(Number(req.auth.id));
+			res.clearCookie("refreshToken");
+			res.clearCookie("accessToken");
+			this.log.info(`user has been logged out with id: ${req.auth.id}`);
+			res.status(200).json({ message: "logged out" });
+		} catch (e) {
+			next(e);
+		}
+	}
+
+	async self(req: AuthRequest, res: Response, next: NextFunction) {
+		const user = await this.userService.findById(req.auth.id);
+		this.log.info(`user has been fetched with id: ${req.auth.id}`);
+		res.json(user);
+	}
+
+	async refreshToken(req: AuthRequest, res: Response, next: NextFunction) {
+		try {
+			const payload: JwtPayload = {
+				id: req.auth.id,
+				role: req.auth.role,
+			};
+
+			await this.tokenService.deleteRefreshToken(Number(req.auth.id));
+			const accessToken = this.tokenService.generateAccessToken(payload);
+			const refreshToken = this.tokenService.generateRefreshToken(payload);
+			const persistedRefreshToken = await this.tokenService.persistRefreshToken(
+				Number(req.auth.id),
+			);
+
+			res.cookie("refreshToken", refreshToken, {
+				httpOnly: true,
+				secure: config.NODE_ENV === "production",
+				sameSite: "strict",
+				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+			});
+
+			res.cookie("accessToken", accessToken, {
+				httpOnly: true,
+				secure: config.NODE_ENV === "production",
+				sameSite: "strict",
+				maxAge: 15 * 60 * 1000, // 15 minutes
+			});
+			this.log.info(`user has been logged in with id: ${req.auth.id}`);
+			res.status(201).json({ id: req.auth.id });
+		} catch (e) {
+			next(e);
+		}
 	}
 }
