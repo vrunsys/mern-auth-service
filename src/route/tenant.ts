@@ -22,4 +22,41 @@ router.post(
 	},
 );
 
+router.patch(
+	"/:id",
+	tenantsValidator,
+	authentication,
+	canAccess([Role.ADMIN]),
+	async (req, res, next) => {
+		await tenantController.updateTenant(req, res, next);
+	},
+);
+
+router.delete(
+	"/:id",
+	authentication,
+	canAccess([Role.ADMIN]),
+	async (req, res, next) => {
+		await tenantController.deleteTenant(req, res, next);
+	},
+);
+
+router.get(
+	"/",
+	authentication,
+	canAccess([Role.ADMIN]),
+	async (req, res, next) => {
+		await tenantController.getTenants(req, res, next);
+	},
+);
+
+router.get(
+	"/:id",
+	authentication,
+	canAccess([Role.ADMIN]),
+	async (req, res, next) => {
+		await tenantController.getTenantById(req, res, next);
+	},
+);
+
 export default router;
