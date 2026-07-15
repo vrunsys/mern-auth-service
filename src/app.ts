@@ -7,6 +7,7 @@ import express, {
 import type { HttpError } from "http-errors";
 import logger from "./config/logger";
 import authRouter from "./route/auth.ts";
+import tenantRouter from "./route/tenant.ts";
 
 const app = express();
 
@@ -20,11 +21,12 @@ app.all("/health", (req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/tenants", tenantRouter);
 
 // biome-ignore lint: correctness/noUnusedVariables
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 	logger.error(err.message);
-	const statusCode = err.statusCode || 500;
+	const statusCode = err.statusCode || err.status || 500;
 	res.status(statusCode).json({
 		errors: [
 			{

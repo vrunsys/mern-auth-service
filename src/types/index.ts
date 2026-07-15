@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import type { usersTable } from "../db/schema.ts";
+import type { tenantsTable, usersTable } from "../db/schema.ts";
 
 export interface RegisterUserRequest extends Request {
 	body: typeof usersTable.$inferInsert;
@@ -24,4 +24,8 @@ export interface AuthRequest extends Request {
 export interface AuthCookie {
 	refreshToken: string;
 	accessToken: string;
+}
+
+export interface TenantRequest extends Request {
+	body: typeof tenantsTable.$inferInsert;
 }

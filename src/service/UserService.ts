@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import createHttpError from "http-errors";
 import db from "../config/db.ts";
+import { Role } from "../constants/index.ts";
 import { usersTable } from "../db/schema.ts";
 
 type NewUser = typeof usersTable.$inferInsert;
@@ -9,7 +10,7 @@ type NewUser = typeof usersTable.$inferInsert;
 export default class UserService {
 	constructor() {}
 
-	async create({ firstName, lastName, email, password }: NewUser) {
+	async create({ firstName, lastName, email, password, role }: NewUser) {
 		const user = await db
 			.select()
 			.from(usersTable)
@@ -25,6 +26,7 @@ export default class UserService {
 				lastName: lastName,
 				email: email,
 				password: hashPassword,
+				role: role || Role.CUSTOMER,
 			};
 
 			const newUser = await db.insert(usersTable).values(user).returning();
