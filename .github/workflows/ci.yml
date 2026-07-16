@@ -38,7 +38,7 @@ jobs:
         run: bun run lint:all
 
       - name: Start test server 
-        run: bun run start > server.log 2>&1 & echo $! > server.pid
+        run: bun run start
         env:
           PORT: ${{ secrets.PORT }}
           NODE_ENV: ${{ secrets.NODE_ENV }}
@@ -47,19 +47,6 @@ jobs:
           JWT_URI: ${{ secrets.JWT_URI }}
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
-      - name: Wait for test server 
-        run: | 
-            for i in {1..30}; do 
-            if curl --silent --fail http://127.0.0.1:4000/health; then 
-            echo "Server is ready" 
-            exit 0 
-            fi
-            echo "Waiting for server..."
-            sleep 1
-            done
-            echo "Server failed to start"
-            cat server.log
-            exit 1
       - name: Test Coverage
         run: bun test --coverage
         env:
