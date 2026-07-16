@@ -7,10 +7,7 @@ import { config } from "../config";
 import db from "../config/db.ts";
 import { refreshTokensTable, type usersTable } from "../db/schema.ts";
 
-const privateKeyPath = path.resolve(
-	import.meta.dirname,
-	"../../keys/private.pem",
-);
+const privateKeyPath = path.resolve(import.meta.dir, "../../keys/private.pem");
 
 function loadPrivateKey(): string {
 	try {

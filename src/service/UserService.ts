@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { eq } from "drizzle-orm";
+import { eq, getColumns } from "drizzle-orm";
 import createHttpError from "http-errors";
 import db from "../config/db.ts";
 import { Role } from "../constants/index.ts";
@@ -61,16 +61,21 @@ export default class UserService {
 	}
 
 	async getAll() {
-		const users = await db.query.users.findMany();
+		const users = await await db.query.users.findMany({
+			columns: {
+				password: false,
+			},
+		});
 		return users;
 	}
 
 	async updateById(id: number, data: Partial<NewUser>) {
+		const { password, ...returningColumns } = getColumns(usersTable);
 		const updatedUser = await db
 			.update(usersTable)
 			.set(data)
 			.where(eq(usersTable.id, id))
-			.returning();
+			.returning({ ...returningColumns });
 		return updatedUser;
 	}
 
