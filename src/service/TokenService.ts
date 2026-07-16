@@ -1,23 +1,23 @@
 import { eq } from "drizzle-orm";
-import fs from "fs";
 import createHttpError from "http-errors";
 import { type JwtPayload, sign } from "jsonwebtoken";
-import path from "path";
 import { config } from "../config";
 import db from "../config/db.ts";
 import { refreshTokensTable, type usersTable } from "../db/schema.ts";
 
-const privateKeyPath = path.resolve(import.meta.dir, "../../keys/private.pem");
-
 function loadPrivateKey(): string {
+	let privateKey: string;
+	if (!config.PRIVATE_KEY) {
+		const error = createHttpError(500, "PRIVATE_KEY not set");
+		throw error;
+	}
 	try {
-		return fs.readFileSync(privateKeyPath, "utf8");
+		privateKey = config.PRIVATE_KEY!;
+		return privateKey;
 	} catch (error) {
-		throw createHttpError(
-			500,
-			`Failed to read private key: ${privateKeyPath}`,
-			{ cause: error },
-		);
+		throw createHttpError(500, `Failed to read private key: ${privateKey!}`, {
+			cause: error,
+		});
 	}
 }
 

@@ -1,5 +1,11 @@
-const { PORT, NODE_ENV, DATABASE_URL, REFRESH_TOKEN_SECRET, JWT_URI } =
-	process.env;
+const {
+	PORT,
+	NODE_ENV,
+	DATABASE_URL,
+	REFRESH_TOKEN_SECRET,
+	JWT_URI,
+	PRIVATE_KEY,
+} = process.env;
 
 export const config = {
 	PORT: PORT,
@@ -7,4 +13,5 @@ export const config = {
 	DATABASE_URL: DATABASE_URL,
 	REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET!,
 	JWT_URI: JWT_URI,
+	PRIVATE_KEY: PRIVATE_KEY!,
 };
