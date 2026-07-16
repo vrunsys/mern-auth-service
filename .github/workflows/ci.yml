@@ -40,6 +40,7 @@ jobs:
       - name: Test Coverage
         run: bun test --coverage
         env:
+          PORT: ${{ secrets.PORT }}
           NODE_ENV: ${{ secrets.NODE_ENV }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
