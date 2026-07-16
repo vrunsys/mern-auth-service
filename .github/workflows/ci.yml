@@ -38,7 +38,11 @@ jobs:
         run: bun run lint:all
 
       - name: Start test server 
+<<<<<<< HEAD
         run: bun run dev
+=======
+        run: bun run start
+>>>>>>> 7731274bf9ecf64b706e71691c3fbf7de9f260a9
         env:
           PORT: ${{ secrets.PORT }}
           NODE_ENV: ${{ secrets.NODE_ENV }}
