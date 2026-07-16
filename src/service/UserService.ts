@@ -59,4 +59,22 @@ export default class UserService {
 
 		return user;
 	}
+
+	async getAll() {
+		const users = await db.query.users.findMany();
+		return users;
+	}
+
+	async updateById(id: number, data: Partial<NewUser>) {
+		const updatedUser = await db
+			.update(usersTable)
+			.set(data)
+			.where(eq(usersTable.id, id))
+			.returning();
+		return updatedUser;
+	}
+
+	async deleteById(id: number) {
+		return await db.delete(usersTable).where(eq(usersTable.id, id));
+	}
 }

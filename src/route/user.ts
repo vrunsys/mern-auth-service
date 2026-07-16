@@ -2,34 +2,52 @@ import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import logger from "../config/logger";
 import { Role } from "../constants";
-import TenantController from "../controller/TenantController";
+import UserController from "../controller/UserController";
 import authentication from "../middleware/authentication";
 import { canAccess } from "../middleware/canAccess";
-import TenantService from "../service/TenantService";
-import tenantsValidator from "../validator/tenants-validator";
+import UserService from "../service/UserService";
+import type { AuthRequest } from "../types";
+import registerValidator from "../validator/register-validator";
 
 const router = express.Router();
 
-const tenantService = new TenantService();
-const tenantController = new TenantController(tenantService, logger);
+const userService = new UserService();
+const controller = new UserController(userService, logger);
 
 router.post(
 	"/",
-	tenantsValidator,
+	authentication,
+	canAccess([Role.ADMIN]),
+	registerValidator,
+	async (req: Request, res: Response, next: NextFunction) => {
+		await controller.createUser(req as AuthRequest, res, next);
+	},
+);
+
+router.get(
+	"/",
 	authentication,
 	canAccess([Role.ADMIN]),
 	async (req: Request, res: Response, next: NextFunction) => {
-		await tenantController.createTenant(req, res, next);
+		await controller.getAllUsers(req as AuthRequest, res, next);
+	},
+);
+
+router.get(
+	"/:id",
+	authentication,
+	canAccess([Role.ADMIN]),
+	async (req: Request, res: Response, next: NextFunction) => {
+		await controller.getUserById(req, res, next);
 	},
 );
 
 router.patch(
 	"/:id",
-	tenantsValidator,
 	authentication,
 	canAccess([Role.ADMIN]),
 	async (req: Request, res: Response, next: NextFunction) => {
-		await tenantController.updateTenant(req, res, next);
+		await controller.updateUser(req, res, next);
 	},
 );
 
@@ -38,25 +56,7 @@ router.delete(
 	authentication,
 	canAccess([Role.ADMIN]),
 	async (req: Request, res: Response, next: NextFunction) => {
-		await tenantController.deleteTenant(req, res, next);
-	},
-);
-
-router.get(
-	"/",
-	authentication,
-	canAccess([Role.ADMIN]),
-	async (req: Request, res: Response, next: NextFunction) => {
-		await tenantController.getTenants(req, res, next);
-	},
-);
-
-router.get(
-	"/:id",
-	authentication,
-	canAccess([Role.ADMIN]),
-	async (req: Request, res: Response, next: NextFunction) => {
-		await tenantController.getTenantById(req, res, next);
+		await controller.deleteUser(req, res, next);
 	},
 );
 

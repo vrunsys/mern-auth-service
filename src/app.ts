@@ -8,6 +8,7 @@ import type { HttpError } from "http-errors";
 import logger from "./config/logger";
 import authRouter from "./route/auth.ts";
 import tenantRouter from "./route/tenant.ts";
+import userRouter from "./route/user.ts";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.all("/health", (req, res) => {
 
 app.use("/auth", authRouter);
 app.use("/tenants", tenantRouter);
+app.use("/users", userRouter);
 
 // biome-ignore lint: correctness/noUnusedVariables
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {

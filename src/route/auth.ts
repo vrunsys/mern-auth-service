@@ -7,6 +7,7 @@ import validateRefreshToken from "../middleware/validateRefreshToken.ts";
 import { CredentialService } from "../service/CredentialService.ts";
 import { TokenService } from "../service/TokenService.ts";
 import UserService from "../service/UserService.ts";
+import type { AuthRequest } from "../types/index.ts";
 import loginValidator from "../validator/login-validator.ts";
 import registerValidator from "../validator/register-validator.ts";
 
@@ -39,21 +40,21 @@ router.get(
 	"/self",
 	authentication,
 	(req: Request, res: Response, next: NextFunction) =>
-		controller.self(req, res, next),
+		controller.self(req as AuthRequest, res, next),
 );
 
 router.post(
 	"/refresh",
 	validateRefreshToken,
 	(req: Request, res: Response, next: NextFunction) =>
-		controller.refreshToken(req, res, next),
+		controller.refreshToken(req as AuthRequest, res, next),
 );
 
 router.post(
 	"/logout",
 	authentication,
 	(req: Request, res: Response, next: NextFunction) =>
-		controller.logout(req, res, next),
+		controller.logout(req as AuthRequest, res, next),
 );
 
 export default router;
