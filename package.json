@@ -9,7 +9,7 @@
 		"format:all": "biome format --write .",
 		"lint:all": "biome lint --fix .",
 		"check:all": "biome check --fix .",
-		"prepare": "husky"
+		"prepare": "bun scripts/prepare-husky.js"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.0",
