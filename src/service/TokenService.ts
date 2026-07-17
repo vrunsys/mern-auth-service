@@ -22,8 +22,6 @@ function loadPrivateKey(): string {
 }
 
 export class TokenService {
-	constructor() {}
-
 	generateAccessToken(payload: JwtPayload) {
 		const privateKey = loadPrivateKey();
 		const accessToken = sign(payload, privateKey, {
@@ -54,9 +52,8 @@ export class TokenService {
 	}
 
 	async deleteRefreshToken(userId: typeof usersTable.$inferSelect.id) {
-		await db
+		return await db
 			.delete(refreshTokensTable)
 			.where(eq(refreshTokensTable.userId, userId));
-		return;
 	}
 }

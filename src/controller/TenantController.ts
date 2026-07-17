@@ -5,8 +5,8 @@ import type TenantService from "../service/TenantService";
 
 export default class TenantController {
 	constructor(
-		private tenantService: TenantService,
-		private log: typeof logger,
+		private readonly tenantService: TenantService,
+		private readonly log: typeof logger,
 	) {}
 	async createTenant(req: Request, res: Response, next: NextFunction) {
 		const results = validationResult(req);
@@ -31,7 +31,7 @@ export default class TenantController {
 			return;
 		}
 		const { name, address } = req.body;
-		const id = parseInt(req.params.id);
+		const id = Number.parseInt(req.params.id);
 		try {
 			const tenant = await this.tenantService.updateTenant(id, {
 				name,
@@ -45,7 +45,7 @@ export default class TenantController {
 	}
 
 	async deleteTenant(req: Request, res: Response, next: NextFunction) {
-		const id = parseInt(req.params.id);
+		const id = Number.parseInt(req.params.id);
 		try {
 			await this.tenantService.deleteTenant(id);
 			this.log.info("Tenant deleted", { id });
@@ -65,7 +65,7 @@ export default class TenantController {
 	}
 
 	async getTenantById(req: Request, res: Response, next: NextFunction) {
-		const id = parseInt(req.params.id);
+		const id = Number.parseInt(req.params.id);
 		try {
 			const tenant = await this.tenantService.getTenantById(id);
 			res.status(200).json(tenant);

@@ -8,8 +8,6 @@ import { usersTable } from "../db/schema.ts";
 type NewUser = typeof usersTable.$inferInsert;
 
 export default class UserService {
-	constructor() {}
-
 	async create({ firstName, lastName, email, password, role }: NewUser) {
 		const user = await db
 			.select()
@@ -31,7 +29,7 @@ export default class UserService {
 
 			const newUser = await db.insert(usersTable).values(user).returning();
 			return newUser;
-		} catch (error) {
+		} catch (error: unknown) {
 			const err = createHttpError(500, "Failed to store in database");
 			throw err;
 		}
@@ -61,7 +59,7 @@ export default class UserService {
 	}
 
 	async getAll() {
-		const users = await await db.query.users.findMany({
+		const users = await db.query.users.findMany({
 			columns: {
 				password: false,
 			},

@@ -1,7 +1,7 @@
-import type { NextFunction, Request, Response } from "express";
+import type { NextFunction, Response } from "express";
 import { validationResult } from "express-validator";
 import createHttpError from "http-errors";
-import { type JwtPayload, sign } from "jsonwebtoken";
+import type { JwtPayload } from "jsonwebtoken";
 import { config } from "../config/index.ts";
 import type logger from "../config/logger.ts";
 import type { usersTable } from "../db/schema.ts";
@@ -16,10 +16,10 @@ import type {
 
 export default class AuthController {
 	constructor(
-		private userService: UserService,
-		private tokenService: TokenService,
-		private credentialService: CredentialService,
-		private log: typeof logger,
+		private readonly userService: UserService,
+		private readonly tokenService: TokenService,
+		private readonly credentialService: CredentialService,
+		private readonly log: typeof logger,
 	) {}
 	async register(req: RegisterUserRequest, res: Response, next: NextFunction) {
 		const result = validationResult(req);
@@ -46,9 +46,7 @@ export default class AuthController {
 
 			const accessToken = this.tokenService.generateAccessToken(payload);
 			const refreshToken = this.tokenService.generateRefreshToken(payload);
-			const persistedRefreshToken = await this.tokenService.persistRefreshToken(
-				newUser[0]?.id as number,
-			);
+			await this.tokenService.persistRefreshToken(newUser[0]?.id as number);
 
 			res.cookie("refreshToken", refreshToken, {
 				httpOnly: true,
@@ -100,9 +98,7 @@ export default class AuthController {
 
 			const accessToken = this.tokenService.generateAccessToken(payload);
 			const refreshToken = this.tokenService.generateRefreshToken(payload);
-			const persistedRefreshToken = await this.tokenService.persistRefreshToken(
-				user[0]!.id,
-			);
+			await this.tokenService.persistRefreshToken(user[0]!.id);
 
 			res.cookie("refreshToken", refreshToken, {
 				httpOnly: true,
@@ -152,9 +148,7 @@ export default class AuthController {
 			await this.tokenService.deleteRefreshToken(Number(req.auth.id));
 			const accessToken = this.tokenService.generateAccessToken(payload);
 			const refreshToken = this.tokenService.generateRefreshToken(payload);
-			const persistedRefreshToken = await this.tokenService.persistRefreshToken(
-				Number(req.auth.id),
-			);
+			await this.tokenService.persistRefreshToken(Number(req.auth.id));
 
 			res.cookie("refreshToken", refreshToken, {
 				httpOnly: true,
