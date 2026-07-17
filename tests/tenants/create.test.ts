@@ -107,7 +107,7 @@ describe("POST /tenants", () => {
 			const tenants = (await db
 				.select()
 				.from(tenantsTable)) as (typeof tenantsTable.$inferSelect)[];
-			expect(tenants.length).toBe(1);
+			expect(tenants.length).toHaveLength(1);
 			expect(tenants[0]?.name).toBe(tenantData.name);
 			expect(tenants[0]?.address).toBe(tenantData.address);
 		});

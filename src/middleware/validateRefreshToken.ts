@@ -21,9 +21,10 @@ export default expressjwt({
 				},
 			});
 			return refreshToken === null;
-		} catch (error) {
+		} catch (error: unknown) {
 			logger.error("Error while validating refresh token", {
 				id: token?.payload.id,
+				errorMessage: (error as Error).message,
 			});
 		}
 		return true;

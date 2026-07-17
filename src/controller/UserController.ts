@@ -8,8 +8,8 @@ import type { AuthRequest } from "../types";
 
 export default class UserController {
 	constructor(
-		private userService: UserService,
-		private log: typeof logger,
+		private readonly userService: UserService,
+		private readonly log: typeof logger,
 	) {}
 
 	async createUser(req: AuthRequest, res: Response, next: NextFunction) {
@@ -28,7 +28,7 @@ export default class UserController {
 				password,
 				role: Role.MANAGER,
 			});
-			this.log;
+			this.log.info("User created", { id: user[0]?.id });
 			res.status(201).json({ id: user[0]?.id });
 		} catch (error) {
 			next(error);
@@ -57,7 +57,8 @@ export default class UserController {
 	async updateUser(req: Request, res: Response, next: NextFunction) {
 		const { id } = req.params;
 		const { firstName, lastName, role } = req.body;
-		if (isNaN(Number(id))) return next(createHttpError(400, "Invalid user id"));
+		if (Number.isNaN(Number(id)))
+			return next(createHttpError(400, "Invalid user id"));
 		try {
 			const user = await this.userService.updateById(Number(id), {
 				firstName,
@@ -73,7 +74,8 @@ export default class UserController {
 
 	async deleteUser(req: Request, res: Response, next: NextFunction) {
 		const { id } = req.params;
-		if (isNaN(Number(id))) return next(createHttpError(400, "Invalid user id"));
+		if (Number.isNaN(Number(id)))
+			return next(createHttpError(400, "Invalid user id"));
 		try {
 			await this.userService.deleteById(Number(id));
 			this.log.info(`User deleted: ${id}`);
