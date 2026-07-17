@@ -6,6 +6,7 @@
 	"scripts": {
 		"build": "bun build ./src/server.ts --outdir ./dist --target bun",
 		"dev": "bun run --watch src/server.ts",
+		"test": "bun test --coverage --parallel=1",
 		"format:all": "biome format --write .",
 		"lint:all": "biome lint --fix .",
 		"check:all": "biome check --fix .",

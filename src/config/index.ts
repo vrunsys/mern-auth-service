@@ -5,6 +5,10 @@ const {
 	REFRESH_TOKEN_SECRET,
 	JWT_URI,
 	PRIVATE_KEY,
+	ADMIN_EMAIL,
+	ADMIN_PASSWORD,
+	ADMIN_FIRST_NAME = "System",
+	ADMIN_LAST_NAME = "Administrator",
 } = process.env;
 
 export const config = {
@@ -14,4 +18,8 @@ export const config = {
 	REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET!,
 	JWT_URI: JWT_URI,
 	PRIVATE_KEY: PRIVATE_KEY!,
+	ADMIN_EMAIL,
+	ADMIN_PASSWORD,
+	ADMIN_FIRST_NAME,
+	ADMIN_LAST_NAME,
 };

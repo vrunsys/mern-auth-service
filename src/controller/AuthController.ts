@@ -4,6 +4,7 @@ import createHttpError from "http-errors";
 import type { JwtPayload } from "jsonwebtoken";
 import { config } from "../config/index.ts";
 import type logger from "../config/logger.ts";
+import { Role } from "../constants/index.ts";
 import type { usersTable } from "../db/schema.ts";
 import type { CredentialService } from "../service/CredentialService.ts";
 import type { TokenService } from "../service/TokenService.ts";
@@ -28,14 +29,14 @@ export default class AuthController {
 			return;
 		}
 		try {
-			const { firstName, lastName, email, password, role } = req.body;
+			const { firstName, lastName, email, password } = req.body;
 
 			const newUser = (await this.userService.create({
 				firstName,
 				lastName,
 				email,
 				password,
-				role,
+				role: Role.CUSTOMER,
 			})) as (typeof usersTable.$inferSelect)[];
 			this.log.info(`user has been register with id: ${newUser[0]?.id}`);
 

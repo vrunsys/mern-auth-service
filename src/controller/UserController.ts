@@ -18,7 +18,7 @@ export default class UserController {
 			return res.status(400).json(result.array());
 		}
 
-		const { firstName, lastName, email, password } = req.body;
+		const { firstName, lastName, email, password, role } = req.body;
 
 		try {
 			const user = await this.userService.create({
@@ -26,7 +26,7 @@ export default class UserController {
 				lastName,
 				email,
 				password,
-				role: Role.MANAGER,
+				role: role || Role.MANAGER,
 			});
 			this.log.info("User created", { id: user[0]?.id });
 			res.status(201).json({ id: user[0]?.id });
@@ -55,6 +55,11 @@ export default class UserController {
 	}
 
 	async updateUser(req: Request, res: Response, next: NextFunction) {
+		const result = validationResult(req);
+		if (!result.isEmpty()) {
+			return res.status(400).json({ errors: result.array() });
+		}
+
 		const { id } = req.params;
 		const { firstName, lastName, role } = req.body;
 		if (Number.isNaN(Number(id)))
