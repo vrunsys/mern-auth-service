@@ -30,7 +30,9 @@ export default class UserService {
 			const newUser = await db.insert(usersTable).values(user).returning();
 			return newUser;
 		} catch (error: unknown) {
-			const err = createHttpError(500, "Failed to store in database");
+			const err = createHttpError(500, "Failed to store in database", {
+				cause: error,
+			});
 			throw err;
 		}
 	}

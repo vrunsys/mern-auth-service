@@ -65,7 +65,7 @@ export default class UserController {
 				lastName,
 				role,
 			});
-			this.log.info(`User updated: ${user}`);
+			this.log.info(`User updated:`, { ...user[0] });
 			res.status(200).json(user);
 		} catch (error) {
 			next(error);
