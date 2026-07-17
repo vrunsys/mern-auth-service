@@ -82,6 +82,23 @@ describe("POST /auth/register", () => {
 			expect(users[0]?.role).toEqual(Role.CUSTOMER);
 		});
 
+		it("should ignore an admin role requested during public registration", async () => {
+			const userData = {
+				firstName: "Public",
+				lastName: "User",
+				role: Role.ADMIN,
+				email: "public-admin-request@example.com",
+				password: "Borravarun@1190",
+			};
+
+			const response = await request(app).post("/auth/register").send(userData);
+			const users = await db.select().from(usersTable);
+
+			expect(response.statusCode).toBe(201);
+			expect(users).toHaveLength(1);
+			expect(users[0]?.role).toBe(Role.CUSTOMER);
+		});
+
 		it("should return hashed password of the user", async () => {
 			const userData = {
 				firstName: "Rakesh",

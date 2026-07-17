@@ -8,6 +8,7 @@ import { canAccess } from "../middleware/canAccess";
 import UserService from "../service/UserService";
 import type { AuthRequest } from "../types";
 import registerValidator from "../validator/register-validator";
+import userRoleValidator from "../validator/user-role-validator.ts";
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.post(
 	authentication,
 	canAccess([Role.ADMIN]),
 	registerValidator,
+	userRoleValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		await controller.createUser(req as AuthRequest, res, next);
 	},
@@ -46,6 +48,7 @@ router.patch(
 	"/:id",
 	authentication,
 	canAccess([Role.ADMIN]),
+	userRoleValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		await controller.updateUser(req, res, next);
 	},
