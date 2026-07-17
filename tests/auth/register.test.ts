@@ -6,7 +6,7 @@ import { Role } from "../../src/constants";
 import { usersTable } from "../../src/db/schema.ts";
 import { isJwt } from "../utils/index.ts";
 
-describe("POST auth/register", () => {
+describe("POST /auth/register", () => {
 	const clearUsers = async () => {
 		await db.delete(usersTable);
 	};
@@ -47,7 +47,7 @@ describe("POST auth/register", () => {
 				email: "rakesh@gmail.com",
 				password: "Borravarun@1190",
 			};
-			const response = await request(app).post("/auth/register").send(userData);
+			await request(app).post("/auth/register").send(userData);
 			const users = await db.select().from(usersTable);
 			expect(users).toHaveLength(1);
 			expect(users[0]?.firstName).toEqual(userData.firstName);
@@ -62,7 +62,7 @@ describe("POST auth/register", () => {
 				email: "rakesh@gmail.com",
 				password: "Borravarun@1190",
 			};
-			const response = await request(app).post("/auth/register").send(userData);
+			await request(app).post("/auth/register").send(userData);
 			const users = await db.select().from(usersTable);
 			expect(users).toHaveLength(1);
 			expect(users[0]?.id).not.toBeNull();
@@ -76,7 +76,7 @@ describe("POST auth/register", () => {
 				email: "rakesh@gmail.com",
 				password: "Borravarun@1190",
 			};
-			const response = await request(app).post("/auth/register").send(userData);
+			await request(app).post("/auth/register").send(userData);
 			const users = await db.select().from(usersTable);
 			expect(users).toHaveLength(1);
 			expect(users[0]?.role).toEqual(Role.CUSTOMER);
@@ -90,7 +90,7 @@ describe("POST auth/register", () => {
 				email: "rakesh@gmail.com",
 				password: "Borravarun@1190",
 			};
-			const response = await request(app).post("/auth/register").send(userData);
+			await request(app).post("/auth/register").send(userData);
 			const users = await db.select().from(usersTable);
 			expect(users).toHaveLength(1);
 			expect(users[0]?.password).not.toBe(userData.password);
@@ -121,7 +121,7 @@ describe("POST auth/register", () => {
 			const response = await request(app).post("/auth/register").send(userData);
 
 			interface Headers {
-				["set-cookie"]: string[];
+				"set-cookie": string[];
 			}
 			// Assert
 			let accessToken = null;
@@ -276,6 +276,24 @@ describe("POST auth/register", () => {
 			expect(
 				(response.body as Record<string, string>).errors.length,
 			).toBeGreaterThan(0);
+		});
+	});
+
+	describe("Database errors", () => {
+		it("should return 500 when the user cannot be stored", async () => {
+			const userData = {
+				firstName: "a".repeat(256),
+				lastName: "User",
+				email: "database-error@example.com",
+				password: "testpassword",
+			};
+
+			const response = await request(app).post("/auth/register").send(userData);
+
+			expect(response.statusCode).toBe(500);
+			expect(response.body.errors[0].message).toBe(
+				"Failed to store in database",
+			);
 		});
 	});
 });

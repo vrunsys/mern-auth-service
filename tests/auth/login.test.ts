@@ -5,7 +5,7 @@ import db from "../../src/config/db.ts";
 import { usersTable } from "../../src/db/schema.ts";
 import { isJwt } from "../utils/index.ts";
 
-describe("POST auth/login", () => {
+describe("POST /auth/login", () => {
 	const clearUsers = async () => {
 		await db.delete(usersTable);
 	};
