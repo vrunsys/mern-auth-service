@@ -11,7 +11,18 @@ export const isJwt = (token: string | null) => {
 			Buffer.from(part, "base64").toString("utf-8");
 		});
 		return true;
-	} catch (e) {
+	} catch (_e) {
 		return false;
 	}
+};
+
+export const getCookieValue = (
+	headers: Record<string, string[] | string | undefined>,
+	name: string,
+) => {
+	const cookies = headers["set-cookie"] || [];
+	const cookieList = Array.isArray(cookies) ? cookies : [cookies];
+	const cookie = cookieList.find((value) => value.startsWith(`${name}=`));
+
+	return cookie?.split(";")[0].split("=")[1] || null;
 };
