@@ -1,4 +1,5 @@
 import CookieParser from "cookie-parser";
+import cors from "cors";
 import express, {
 	type NextFunction,
 	type Request,
@@ -11,7 +12,14 @@ import tenantRouter from "./route/tenant.ts";
 import userRouter from "./route/user.ts";
 
 const app = express();
+const origins = process.env.ORIGINS?.split(",") ?? [];
 
+app.use(
+	cors({
+		origin: origins,
+		credentials: true,
+	}),
+);
 app.use(express.static("public", { dotfiles: "allow" }));
 app.use(CookieParser());
 app.use(express.json());
