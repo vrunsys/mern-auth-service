@@ -8,7 +8,14 @@ import { usersTable } from "../db/schema.ts";
 type NewUser = typeof usersTable.$inferInsert;
 
 export default class UserService {
-	async create({ firstName, lastName, email, password, role }: NewUser) {
+	async create({
+		firstName,
+		lastName,
+		email,
+		password,
+		role,
+		tentantId,
+	}: NewUser) {
 		const user = await db
 			.select()
 			.from(usersTable)
@@ -25,6 +32,7 @@ export default class UserService {
 				email: email,
 				password: hashPassword,
 				role: role || Role.CUSTOMER,
+				tentantId: tentantId || null,
 			};
 
 			const newUser = await db.insert(usersTable).values(user).returning();
@@ -54,6 +62,9 @@ export default class UserService {
 			},
 			where: {
 				id: id,
+			},
+			with: {
+				tenants: true,
 			},
 		});
 
