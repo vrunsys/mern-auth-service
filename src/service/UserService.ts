@@ -55,6 +55,9 @@ export default class UserService {
 			where: {
 				id: id,
 			},
+			with: {
+				tenants: true,
+			},
 		});
 
 		return user;
