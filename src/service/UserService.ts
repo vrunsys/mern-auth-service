@@ -32,7 +32,7 @@ export default class UserService {
 				email: email,
 				password: hashPassword,
 				role: role || Role.CUSTOMER,
-				tentantId: tentantId,
+				tentantId: tentantId || null,
 			};
 
 			const newUser = await db.insert(usersTable).values(user).returning();

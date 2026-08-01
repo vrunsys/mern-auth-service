@@ -27,7 +27,7 @@ export default class UserController {
 				email,
 				password,
 				role: role || Role.MANAGER,
-				tentantId: tenantId,
+				tentantId: tenantId || null,
 			});
 			this.log.info("User created", { id: user[0]?.id });
 			res.status(201).json({ id: user[0]?.id });
