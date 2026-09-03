@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { matchedData, validationResult } from "express-validator";
 import type logger from "../config/logger";
 import type TenantService from "../service/TenantService";
 
@@ -56,8 +56,13 @@ export default class TenantController {
 	}
 
 	async getTenants(req: Request, res: Response, next: NextFunction) {
+		const validateQuery = matchedData(req);
+		const { currentPage, perPage } = validateQuery;
 		try {
-			const tenants = await this.tenantService.getAllTenants();
+			const tenants = await this.tenantService.getAllTenants({
+				currentPage,
+				perPage,
+			});
 			res.status(200).json(tenants);
 		} catch (error) {
 			next(error);

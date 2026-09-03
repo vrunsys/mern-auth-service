@@ -7,6 +7,7 @@ import authentication from "../middleware/authentication";
 import { canAccess } from "../middleware/canAccess";
 import UserService from "../service/UserService";
 import type { AuthRequest } from "../types";
+import listValidator from "../validator/list-validator.ts";
 import registerValidator from "../validator/register-validator";
 import userRoleValidator from "../validator/user-role-validator.ts";
 
@@ -30,6 +31,7 @@ router.get(
 	"/",
 	authentication,
 	canAccess([Role.ADMIN]),
+	listValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		await controller.getAllUsers(req as AuthRequest, res, next);
 	},

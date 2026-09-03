@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { matchedData, validationResult } from "express-validator";
 import createHttpError from "http-errors";
 import type logger from "../config/logger.ts";
 import { Role } from "../constants/index.ts";
@@ -37,8 +37,10 @@ export default class UserController {
 	}
 
 	async getAllUsers(req: Request, res: Response, next: NextFunction) {
+		const validatedQuery = matchedData(req);
+		const { currentPage, perPage } = validatedQuery;
 		try {
-			const users = await this.userService.getAll();
+			const users = await this.userService.getAll({ currentPage, perPage });
 			res.status(200).json(users);
 		} catch (error) {
 			next(error);

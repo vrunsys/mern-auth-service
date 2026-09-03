@@ -6,6 +6,7 @@ import TenantController from "../controller/TenantController";
 import authentication from "../middleware/authentication";
 import { canAccess } from "../middleware/canAccess";
 import TenantService from "../service/TenantService";
+import listValidator from "../validator/list-validator";
 import tenantsValidator from "../validator/tenants-validator";
 
 const router = express.Router();
@@ -46,6 +47,7 @@ router.get(
 	"/",
 	authentication,
 	canAccess([Role.ADMIN]),
+	listValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		await tenantController.getTenants(req, res, next);
 	},

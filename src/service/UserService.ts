@@ -4,6 +4,7 @@ import createHttpError from "http-errors";
 import db from "../config/db.ts";
 import { Role } from "../constants/index.ts";
 import { usersTable } from "../db/schema.ts";
+import type { ValidatedQuery } from "../types/index.ts";
 
 type NewUser = typeof usersTable.$inferInsert;
 
@@ -71,11 +72,14 @@ export default class UserService {
 		return user;
 	}
 
-	async getAll() {
+	async getAll(validatedQuery: ValidatedQuery) {
+		const { currentPage, perPage } = validatedQuery;
 		const users = await db.query.users.findMany({
 			columns: {
 				password: false,
 			},
+			limit: perPage,
+			offset: (currentPage - 1) * perPage,
 		});
 		return users;
 	}

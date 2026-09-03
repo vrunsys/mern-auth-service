@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import db from "../config/db";
 import { tenantsTable } from "../db/schema";
+import type { ValidatedQuery } from "../types";
 
 export default class TenantService {
 	async create(tenant: typeof tenantsTable.$inferInsert) {
@@ -15,8 +16,13 @@ export default class TenantService {
 			.returning();
 	}
 
-	async getAllTenants() {
-		return await db.select().from(tenantsTable);
+	async getAllTenants(validatedQuery: ValidatedQuery) {
+		const { currentPage, perPage } = validatedQuery;
+		return await db
+			.select()
+			.from(tenantsTable)
+			.limit(perPage)
+			.offset((currentPage - 1) * perPage);
 	}
 
 	async getTenantById(id: number) {

@@ -5,6 +5,11 @@ export interface RegisterUserRequest extends Request {
 	body: typeof usersTable.$inferInsert;
 }
 
+export interface ValidatedQuery {
+	currentPage: number;
+	perPage: number;
+}
+
 export interface LoginUserRequest extends Request {
 	body: {
 		email: string;

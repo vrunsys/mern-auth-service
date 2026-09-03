@@ -55,7 +55,6 @@ describe("Bootstrap admin", () => {
 			password: adminConfig.password,
 		});
 		const accessToken = getCookieValue(loginResponse.headers, "accessToken");
-
 		expect(loginResponse.statusCode).toBe(201);
 		expect(accessToken).not.toBeNull();
 
@@ -88,7 +87,7 @@ describe("Bootstrap admin", () => {
 		});
 		expect(registerResponse.statusCode).toBe(201);
 
-		await expect(ensureBootstrapAdmin(adminConfig)).rejects.toThrow(
+		expect(ensureBootstrapAdmin(adminConfig)).rejects.toThrow(
 			"refusing automatic privilege escalation",
 		);
 	});
