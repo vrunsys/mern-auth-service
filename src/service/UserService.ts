@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { eq, getColumns } from "drizzle-orm";
+import { count, eq, getColumns } from "drizzle-orm";
 import createHttpError from "http-errors";
 import db from "../config/db.ts";
 import { Role } from "../constants/index.ts";
@@ -74,6 +74,9 @@ export default class UserService {
 
 	async getAll(validatedQuery: ValidatedQuery) {
 		const { currentPage, perPage } = validatedQuery;
+		const totalUsers = await db
+			.select({ count: count(usersTable.id) })
+			.from(usersTable);
 		const users = await db.query.users.findMany({
 			columns: {
 				password: false,
@@ -81,7 +84,12 @@ export default class UserService {
 			limit: perPage,
 			offset: (currentPage - 1) * perPage,
 		});
-		return users;
+		return {
+			currentPage,
+			perPage,
+			count: totalUsers[0]?.count ?? 0,
+			users,
+		};
 	}
 
 	async updateById(id: number, data: Partial<NewUser>) {

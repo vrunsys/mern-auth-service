@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import db from "../config/db";
 import { tenantsTable } from "../db/schema";
 import type { ValidatedQuery } from "../types";
@@ -18,11 +18,20 @@ export default class TenantService {
 
 	async getAllTenants(validatedQuery: ValidatedQuery) {
 		const { currentPage, perPage } = validatedQuery;
-		return await db
+		const totalUsers = await db
+			.select({ count: count(tenantsTable.id) })
+			.from(tenantsTable);
+		const tenants = await db
 			.select()
 			.from(tenantsTable)
 			.limit(perPage)
 			.offset((currentPage - 1) * perPage);
+		return {
+			currentPage,
+			perPage,
+			count: totalUsers[0]?.count ?? 0,
+			tenants,
+		};
 	}
 
 	async getTenantById(id: number) {
