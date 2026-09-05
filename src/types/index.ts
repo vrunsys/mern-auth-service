@@ -8,6 +8,8 @@ export interface RegisterUserRequest extends Request {
 export interface ValidatedQuery {
 	currentPage: number;
 	perPage: number;
+	role: string;
+	q: string;
 }
 
 export interface LoginUserRequest extends Request {

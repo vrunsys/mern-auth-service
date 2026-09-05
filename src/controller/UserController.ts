@@ -38,9 +38,14 @@ export default class UserController {
 
 	async getAllUsers(req: Request, res: Response, next: NextFunction) {
 		const validatedQuery = matchedData(req);
-		const { currentPage, perPage } = validatedQuery;
+		const { currentPage, perPage, role, q } = validatedQuery;
 		try {
-			const users = await this.userService.getAll({ currentPage, perPage });
+			const users = await this.userService.getAll({
+				currentPage,
+				perPage,
+				role,
+				q,
+			});
 			res.status(200).json(users);
 		} catch (error) {
 			next(error);

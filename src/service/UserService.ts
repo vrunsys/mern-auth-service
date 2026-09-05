@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { count, eq, getColumns } from "drizzle-orm";
+import { and, eq, getColumns, ilike, or } from "drizzle-orm";
 import createHttpError from "http-errors";
 import db from "../config/db.ts";
 import { Role } from "../constants/index.ts";
@@ -73,21 +73,48 @@ export default class UserService {
 	}
 
 	async getAll(validatedQuery: ValidatedQuery) {
-		const { currentPage, perPage } = validatedQuery;
-		const totalUsers = await db
-			.select({ count: count(usersTable.id) })
-			.from(usersTable);
-		const users = await db.query.users.findMany({
+		const { currentPage, perPage, role, q } = validatedQuery;
+
+		let users: (typeof usersTable.$inferSelect)[];
+		if (role || q) {
+			users = await db
+				.select()
+				.from(usersTable)
+				.where(
+					and(
+						q
+							? or(
+									ilike(usersTable.firstName, `%${q}%`),
+									ilike(usersTable.lastName, `%${q}%`),
+									ilike(usersTable.email, `%${q}%`),
+									eq(usersTable.role, role),
+								)
+							: undefined,
+
+						role ? eq(usersTable.role, role) : undefined,
+					),
+				);
+
+			return {
+				currentPage,
+				perPage,
+				count: users.length ?? 0,
+				users,
+			};
+		}
+
+		users = await db.query.users.findMany({
 			columns: {
 				password: false,
 			},
 			limit: perPage,
 			offset: (currentPage - 1) * perPage,
 		});
+
 		return {
 			currentPage,
 			perPage,
-			count: totalUsers[0]?.count ?? 0,
+			count: users.length ?? 0,
 			users,
 		};
 	}

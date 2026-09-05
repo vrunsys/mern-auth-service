@@ -9,11 +9,27 @@ export default checkSchema({
 			},
 		},
 	},
+
 	perPage: {
 		customSanitizer: {
 			options: (value) => {
 				const parsedValue = Number(value);
 				return Number.isNaN(parsedValue) ? 2 : parsedValue;
+			},
+		},
+	},
+
+	role: {
+		customSanitizer: {
+			options: (value) => {
+				return value?.trim() ?? "";
+			},
+		},
+	},
+	q: {
+		customSanitizer: {
+			options: (value) => {
+				return value?.trim() ?? "";
 			},
 		},
 	},
