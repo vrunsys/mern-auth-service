@@ -6,7 +6,7 @@ import TenantController from "../controller/TenantController";
 import authentication from "../middleware/authentication";
 import { canAccess } from "../middleware/canAccess";
 import TenantService from "../service/TenantService";
-import listValidator from "../validator/list-validator";
+import listValidator from "../validator/list-tenant-validator";
 import tenantsValidator from "../validator/tenants-validator";
 
 const router = express.Router();

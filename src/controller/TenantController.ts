@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { matchedData, validationResult } from "express-validator";
 import type logger from "../config/logger";
 import type TenantService from "../service/TenantService";
+import type { ValidatedQuery } from "../types";
 
 export default class TenantController {
 	constructor(
@@ -57,12 +58,13 @@ export default class TenantController {
 
 	async getTenants(req: Request, res: Response, next: NextFunction) {
 		const validateQuery = matchedData(req);
-		const { currentPage, perPage } = validateQuery;
+		const { currentPage, perPage, q } = validateQuery;
 		try {
 			const tenants = await this.tenantService.getAllTenants({
 				currentPage,
 				perPage,
-			});
+				q,
+			} as ValidatedQuery);
 			res.status(200).json(tenants);
 		} catch (error) {
 			next(error);
