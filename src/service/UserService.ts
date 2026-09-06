@@ -3,7 +3,7 @@ import { and, eq, getColumns, ilike, or } from "drizzle-orm";
 import createHttpError from "http-errors";
 import db from "../config/db.ts";
 import { Role } from "../constants/index.ts";
-import { usersTable } from "../db/schema.ts";
+import { tenantsTable, usersTable } from "../db/schema.ts";
 import type { ValidatedQuery } from "../types/index.ts";
 
 type NewUser = typeof usersTable.$inferInsert;
@@ -74,12 +74,12 @@ export default class UserService {
 
 	async getAll(validatedQuery: ValidatedQuery) {
 		const { currentPage, perPage, role, q } = validatedQuery;
-
-		let users: (typeof usersTable.$inferSelect)[];
+		const { password, ...returningColumns } = getColumns(usersTable);
 		if (role || q) {
-			users = await db
-				.select()
+			const users = await db
+				.select({ ...returningColumns, tenants: tenantsTable })
 				.from(usersTable)
+				.leftJoin(tenantsTable, eq(usersTable.tentantId, tenantsTable.id))
 				.where(
 					and(
 						q
@@ -103,12 +103,15 @@ export default class UserService {
 			};
 		}
 
-		users = await db.query.users.findMany({
+		const users = await db.query.users.findMany({
 			columns: {
 				password: false,
 			},
 			limit: perPage,
 			offset: (currentPage - 1) * perPage,
+			with: {
+				tenants: true,
+			},
 		});
 
 		return {

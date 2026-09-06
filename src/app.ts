@@ -7,6 +7,7 @@ import express, {
 } from "express";
 import type { HttpError } from "http-errors";
 import logger from "./config/logger";
+import { globalError } from "./middleware/globalError.ts";
 import authRouter from "./route/auth.ts";
 import tenantRouter from "./route/tenant.ts";
 import userRouter from "./route/user.ts";
@@ -34,19 +35,6 @@ app.use("/tenants", tenantRouter);
 app.use("/users", userRouter);
 
 // biome-ignore lint: correctness/noUnusedVariables
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-	logger.error(err.message);
-	const statusCode = err.statusCode || err.status || 500;
-	res.status(statusCode).json({
-		errors: [
-			{
-				type: err.name,
-				message: err.message,
-				path: "",
-				location: "",
-			},
-		],
-	});
-});
+app.use(globalError);
 
 export default app;

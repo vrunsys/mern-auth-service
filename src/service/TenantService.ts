@@ -1,4 +1,4 @@
-import { count, eq } from "drizzle-orm";
+import { and, eq, ilike, or } from "drizzle-orm";
 import db from "../config/db";
 import { tenantsTable } from "../db/schema";
 import type { ValidatedQuery } from "../types";
@@ -17,11 +17,34 @@ export default class TenantService {
 	}
 
 	async getAllTenants(validatedQuery: ValidatedQuery) {
-		const { currentPage, perPage } = validatedQuery;
-		const totalUsers = await db
-			.select({ count: count(tenantsTable.id) })
-			.from(tenantsTable);
-		const tenants = await db
+		const { currentPage, perPage, q } = validatedQuery;
+
+		let tenants: (typeof tenantsTable.$inferSelect)[];
+
+		if (q) {
+			tenants = await db
+				.select()
+				.from(tenantsTable)
+				.where(
+					and(
+						q
+							? or(
+									ilike(tenantsTable.name, `%${q}%`),
+									ilike(tenantsTable.address, `%${q}%`),
+								)
+							: undefined,
+					),
+				);
+
+			return {
+				currentPage,
+				perPage,
+				count: tenants.length,
+				tenants,
+			};
+		}
+
+		tenants = await db
 			.select()
 			.from(tenantsTable)
 			.limit(perPage)
@@ -29,7 +52,7 @@ export default class TenantService {
 		return {
 			currentPage,
 			perPage,
-			count: totalUsers[0]?.count ?? 0,
+			count: tenants.length,
 			tenants,
 		};
 	}

@@ -15,7 +15,9 @@ export default class UserController {
 	async createUser(req: AuthRequest, res: Response, next: NextFunction) {
 		const result = validationResult(req);
 		if (!result.isEmpty()) {
-			return res.status(400).json(result.array());
+			return next(
+				createHttpError(400, { errors: result.array()[0].msg as string }),
+			);
 		}
 
 		const { firstName, lastName, email, password, role, tenantId } = req.body;
@@ -69,7 +71,7 @@ export default class UserController {
 		}
 
 		const { id } = req.params;
-		const { firstName, lastName, role } = req.body;
+		const { firstName, lastName, role, email, tenantId } = req.body;
 		if (Number.isNaN(Number(id)))
 			return next(createHttpError(400, "Invalid user id"));
 		try {
@@ -77,6 +79,8 @@ export default class UserController {
 				firstName,
 				lastName,
 				role,
+				email,
+				...(tenantId && { tentantId: Number(tenantId) }),
 			});
 			this.log.info(`User updated:`, { ...user[0] });
 			res.status(200).json(user);
